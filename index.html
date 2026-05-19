@@ -1024,7 +1024,8 @@ function renderMM(){
     var pos=layout(mm,30,30);
     var mx=0,my=0;
     pos.forEach(function(p){if(p.x+p.n.w+50>mx)mx=p.x+p.n.w+50;if(p.y+p.n.h+30>my)my=p.y+p.n.h+30;});
-    var sw=mx+50,sh=my+50;
+    var pad=400;
+    var sw=mx+pad*2,sh=my+pad*2;
     var theme=getTheme();
     // 设置背景色
     area.style.background=theme.bg;
@@ -1054,6 +1055,7 @@ function renderMM(){
     defs+='</defs>';
     var s='<svg class="mm-svg" width="'+sw+'" height="'+sh+'" style="transform:scale('+mmScale+');transform-origin:0 0">';
     s+=defs;
+    s+='<g transform="translate('+pad+','+pad+')">';
     // 连线
     pos.forEach(function(p){
         if(p.n.expanded&&p.n.children&&p.n.children.length){
@@ -1108,7 +1110,7 @@ function renderMM(){
         s+='<text x="'+addX+'" y="'+(p.y+Math.min(14,p.n.h/2))+'" dominant-baseline="middle" class="mm-add" data-add="'+p.id+'">+</text>';
         s+='</g>';
     });
-    s+='</svg>';
+    s+='</g></svg>';
     area.innerHTML=s;
     bindMMEvents();
 }
@@ -2515,7 +2517,7 @@ document.getElementById('reportBtn').onclick=async function(){
         // 知识点列表
         +'<div style="margin-bottom:14px"><h3 style="font-size:13px;font-weight:600;color:#3730a3;margin-bottom:6px"><i class="fas fa-book" style="margin-right:4px"></i>已建知识点 ('+totalKP+'个)</h3>'+kpHtml+'</div>'
         // 脑图预览
-        +'<div style="margin-bottom:14px"><h3 style="font-size:13px;font-weight:600;color:#3730a3;margin-bottom:6px"><i class="fas fa-brain" style="margin-right:4px"></i>脑图结构</h3>'+mmSVG+'</div>'
+        +'<div style="margin-bottom:14px;page-break-before:always"><h3 style="font-size:13px;font-weight:600;color:#3730a3;margin-bottom:6px"><i class="fas fa-brain" style="margin-right:4px"></i>脑图结构</h3>'+mmSVG+'</div>'
         +'</div>';
 
     // 下载PDF
