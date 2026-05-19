@@ -1023,8 +1023,7 @@ function renderMM(){
     var pos=layout(mm,30,30);
     var mx=0,my=0;
     pos.forEach(function(p){if(p.x+p.n.w+50>mx)mx=p.x+p.n.w+50;if(p.y+p.n.h+30>my)my=p.y+p.n.h+30;});
-    var pad=400;
-    var sw=mx+pad*2,sh=my+pad*2;
+    var sw=mx+50,sh=my+50;
     var theme=getTheme();
     // 设置背景色
     area.style.background=theme.bg;
@@ -1054,7 +1053,6 @@ function renderMM(){
     defs+='</defs>';
     var s='<svg class="mm-svg" width="'+sw+'" height="'+sh+'" style="transform:scale('+mmScale+');transform-origin:0 0">';
     s+=defs;
-    s+='<g transform="translate('+pad+','+pad+')">';
     // 连线
     pos.forEach(function(p){
         if(p.n.expanded&&p.n.children&&p.n.children.length){
@@ -1109,8 +1107,9 @@ function renderMM(){
         s+='<text x="'+addX+'" y="'+(p.y+Math.min(14,p.n.h/2))+'" dominant-baseline="middle" class="mm-add" data-add="'+p.id+'">+</text>';
         s+='</g>';
     });
-    s+='</g></svg>';
+    s+='</svg>';
     area.innerHTML=s;
+    applyMMPan();
     bindMMEvents();
 }
 
@@ -1309,14 +1308,19 @@ function showEd(id){
 // 脑图缩放
 document.getElementById('mmZoomIn').onclick=function(){mmScale=Math.min(mmScale+0.15,2.5);renderMM();};
 document.getElementById('mmZoomOut').onclick=function(){mmScale=Math.max(mmScale-0.15,0.3);renderMM();};
-document.getElementById('mmFit').onclick=function(){mmScale=1;renderMM();};
+document.getElementById('mmFit').onclick=function(){mmScale=1;panOfsX=0;panOfsY=0;renderMM();};
 
-// 脑图拖拽平移
-var isPanning=false,panStartX=0,panStartY=0;
+// 脑图拖拽平移（transform方式）
+var isPanning=false,panStartX=0,panStartY=0,panOfsX=0,panOfsY=0;
 var mmArea=document.getElementById('mmArea');
-mmArea.addEventListener('mousedown',function(e){if(e.target.closest('.mm-g')||e.target.dataset.tog||e.target.dataset.add||e.target.dataset.collapse)return;isPanning=true;panStartX=e.clientX;panStartY=e.clientY;mmArea.style.cursor='grabbing';});
-document.addEventListener('mousemove',function(e){if(!isPanning)return;var dx=e.clientX-panStartX,dy=e.clientY-panStartY;mmArea.scrollLeft-=dx;mmArea.scrollTop-=dy;panStartX=e.clientX;panStartY=e.clientY;});
-document.addEventListener('mouseup',function(){isPanning=false;mmArea.style.cursor='grab';});
+mmArea.style.overflow='hidden';
+function applyMMPan(){
+    var svg=mmArea.querySelector('.mm-svg');
+    if(svg)svg.style.transform='scale('+mmScale+') translate('+panOfsX/mmScale+'px,'+panOfsY/mmScale+'px)';
+}
+mmArea.addEventListener('mousedown',function(e){if(e.target.closest('.mm-g')||e.target.dataset.tog||e.target.dataset.add||e.target.dataset.collapse)return;isPanning=true;panStartX=e.clientX;panStartY=e.clientY;mmArea.style.cursor='grabbing';e.preventDefault();});
+document.addEventListener('mousemove',function(e){if(!isPanning)return;var dx=e.clientX-panStartX,dy=e.clientY-panStartY;panOfsX+=dx;panOfsY+=dy;panStartX=e.clientX;panStartY=e.clientY;applyMMPan();});
+document.addEventListener('mouseup',function(){if(isPanning){isPanning=false;mmArea.style.cursor='grab';}});
 
 // ========== 子节点拖拽排序 ==========
 mmArea.addEventListener('mousedown',function(e){
@@ -1371,8 +1375,8 @@ var freeDragHoverId=null; // 拖拽时悬停的目标节点ID
 
 function findNodeAtPoint(clientX,clientY,skipId){
     var areaRect=mmArea.getBoundingClientRect();
-    var svgX=(clientX-areaRect.left+mmArea.scrollLeft)/mmScale;
-    var svgY=(clientY-areaRect.top+mmArea.scrollTop)/mmScale;
+    var svgX=(clientX-areaRect.left-panOfsX)/mmScale;
+    var svgY=(clientY-areaRect.top-panOfsY)/mmScale;
     var allGs=mmArea.querySelectorAll('.mm-g');
     for(var i=0;i<allGs.length;i++){
         var gg=allGs[i];
@@ -1422,8 +1426,8 @@ document.addEventListener('mousemove',function(e){
         mmArea.querySelectorAll('.mm-drop').forEach(function(el){el.classList.remove('mm-drop');});
         // 用鼠标坐标在SVG中查找目标节点
         var areaRect=mmArea.getBoundingClientRect();
-        var svgX=(e.clientX-areaRect.left+mmArea.scrollLeft)/mmScale;
-        var svgY=(e.clientY-areaRect.top+mmArea.scrollTop)/mmScale;
+        var svgX=(e.clientX-areaRect.left-panOfsX)/mmScale;
+        var svgY=(e.clientY-areaRect.top-panOfsY)/mmScale;
         var allGs=mmArea.querySelectorAll('.mm-g');
         for(var i=0;i<allGs.length;i++){
             var gg=allGs[i];
@@ -1485,8 +1489,8 @@ document.addEventListener('mouseup',function(e){
         mmArea.querySelectorAll('.mm-drop').forEach(function(el){el.classList.remove('mm-drop');});
         // 用鼠标坐标在SVG中查找目标节点
         var areaRect=mmArea.getBoundingClientRect();
-        var svgX=(e.clientX-areaRect.left+mmArea.scrollLeft)/mmScale;
-        var svgY=(e.clientY-areaRect.top+mmArea.scrollTop)/mmScale;
+        var svgX=(e.clientX-areaRect.left-panOfsX)/mmScale;
+        var svgY=(e.clientY-areaRect.top-panOfsY)/mmScale;
         var hoverG=null;
         // 遍历所有节点，找到包含鼠标位置的节点
         var allGs=mmArea.querySelectorAll('.mm-g');
