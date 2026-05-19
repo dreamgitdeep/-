@@ -892,7 +892,7 @@ var MM_THEMES=[
         ],
         link:'#a3a38a',linkOp:.5}
 ];
-var mmThemeId=localStorage.getItem('mm_theme')||'rainbow';
+var mmThemeId=localStorage.getItem('mm_theme')||'candy';
 function getTheme(){return MM_THEMES.find(function(t){return t.id===mmThemeId;})||MM_THEMES[1];}
 function getLevelStyle(depth){
     var t=getTheme();
@@ -2390,17 +2390,11 @@ userInput.addEventListener('keydown',function(e){
 });
 
 // ========== 主题/字号 ==========
-var THEME_MM_MAP={tp:'rainbow',tl:'rainbow',to:'candy',tf:'nature'};
 function applyTheme(th){
     document.body.className=th;
     localStorage.setItem('theme_v2',th);
-    // 同步脑图主题
-    var newMM=THEME_MM_MAP[th]||'rainbow';
-    mmThemeId=newMM;
-    localStorage.setItem('mm_theme',newMM);
-    renderMM();
 }
-var st=localStorage.getItem('theme_v2')||'tp';if(st==='td')st='tp';applyTheme(st);document.getElementById('themeSel').value=st;
+var st=localStorage.getItem('theme_v2')||'tl';if(st==='td')st='tl';applyTheme(st);document.getElementById('themeSel').value=st;
 document.getElementById('themeSel').onchange=function(e){applyTheme(e.target.value);};
 document.getElementById('sizeSel').onchange=function(e){
     var size=e.target.value+'px';
