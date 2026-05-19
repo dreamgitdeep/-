@@ -208,7 +208,6 @@ body{display:flex;flex-direction:column;font-family:system-ui,-apple-system,sans
 <span style="font-size:10px;background:#e0e7ff;color:#4338ca;padding:1px 6px;border-radius:8px">V1.0</span>
 </div>
 <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">
-<button id="resetBtn" class="bg" style="background:#f1f5f9"><i class="fas fa-expand" style="margin-right:3px"></i>重置</button>
 <select id="themeSel" style="font-size:11px;border:1px solid #e2e8f0;border-radius:12px;padding:2px 6px"><option value="tp">📜 羊皮纸</option><option value="tl">☀️ 浅色</option><option value="to">🌊 海蓝</option><option value="tf">🌲 森绿</option><option value="td">🌙 暗夜</option></select>
 <select id="sizeSel" style="font-size:11px;border:1px solid #e2e8f0;border-radius:12px;padding:2px 6px"><option value="13">13px</option><option value="14" selected>14px</option><option value="16">16px</option></select>
 <button id="reportBtn" class="bp"><i class="fas fa-download" style="margin-right:3px"></i>学习报告</button>
@@ -1977,23 +1976,6 @@ function adjustPanels(){
     setTimeout(function(){renderMM();},100);
 }
 
-// ========== 折叠/重置 ==========
-document.getElementById('resetBtn').onclick=function(){
-    // 展开所有面板
-    ['pLeft','pMid','pRight'].forEach(function(id){
-        var p=document.getElementById(id);
-        p.classList.remove('collapsed');
-        p.style.width='33%';p.style.flex='';
-    });
-    document.getElementById('bar1').style.display='';
-    document.getElementById('bar2').style.display='';
-    // 隐藏所有展开按钮
-    document.querySelectorAll('.expand-btn').forEach(function(btn){
-        btn.classList.add('hidden');
-    });
-    mmScale=1;renderMM();
-};
-
 // ========== 模式切换 ==========
 var quizLevel='easy'; // 默认难度
 document.querySelectorAll('.mode-btn').forEach(function(btn){
@@ -2367,7 +2349,16 @@ userInput.addEventListener('keydown',function(e){
 });
 
 // ========== 主题/字号 ==========
-function applyTheme(th){document.body.className=th;localStorage.setItem('theme_v2',th);}
+var THEME_MM_MAP={tp:'rainbow',tl:'rainbow',to:'candy',tf:'nature',td:'dark'};
+function applyTheme(th){
+    document.body.className=th;
+    localStorage.setItem('theme_v2',th);
+    // 同步脑图主题
+    var newMM=THEME_MM_MAP[th]||'rainbow';
+    mmThemeId=newMM;
+    localStorage.setItem('mm_theme',newMM);
+    renderMM();
+}
 var st=localStorage.getItem('theme_v2')||'tp';applyTheme(st);document.getElementById('themeSel').value=st;
 document.getElementById('themeSel').onchange=function(e){applyTheme(e.target.value);};
 document.getElementById('sizeSel').onchange=function(e){
