@@ -14,6 +14,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 body{display:flex;flex-direction:column;font-family:system-ui,-apple-system,sans-serif;transition:background .3s,color .3s}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:4px}
@@ -512,6 +513,40 @@ function renderTB(){
     document.getElementById('tbContent').innerHTML=html;
     bindDrag();
 }
+// 选中文字浮动操作按钮
+(function(){
+    var floater=null;
+    function removeFloater(){if(floater){floater.remove();floater=null;}}
+    document.addEventListener('mouseup',function(e){
+        setTimeout(function(){
+            var sel=window.getSelection();
+            var text=sel?sel.toString().trim():'';
+            var tbContent=document.getElementById('tbContent');
+            if(!text||!tbContent||!tbContent.contains(sel.anchorNode)){removeFloater();return;}
+            removeFloater();
+            var range=sel.getRangeAt(0);
+            var rect=range.getBoundingClientRect();
+            floater=document.createElement('div');
+            floater.style.cssText='position:fixed;z-index:9999;display:flex;gap:6px;background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:6px 10px;left:'+(rect.left+rect.width/2-90)+'px;top:'+(rect.top-44)+'px;animation:fadeInUp .15s ease';
+            floater.innerHTML='<button id="selAddMM" style="background:#4f46e5;color:#fff;border:none;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap"><i class="fas fa-brain" style="margin-right:3px"></i>添加到脑图</button>'
+                +'<button id="selSearch" style="background:#f1f5f9;color:#475569;border:none;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap"><i class="fas fa-search" style="margin-right:3px"></i>搜索</button>';
+            document.body.appendChild(floater);
+            document.getElementById('selAddMM').onclick=function(){
+                dragText=text;
+                toast('已复制文字，请点击脑图节点添加');
+                removeFloater();
+            };
+            document.getElementById('selSearch').onclick=function(){
+                document.getElementById('userInput').value='请帮我解释：'+text;
+                document.getElementById('sendBtn').click();
+                removeFloater();
+            };
+        },10);
+    });
+    document.addEventListener('mousedown',function(e){
+        if(floater&&!floater.contains(e.target))removeFloater();
+    });
+})();
 function buildTabs(){
     var c=document.getElementById('tabs');c.innerHTML='';
     updateTextbookSelector();
@@ -1872,23 +1907,20 @@ function initResize(barId,leftId,rightId){
     var left=document.getElementById(leftId);
     var right=document.getElementById(rightId);
     var main=document.getElementById('main');
-    var startX,startW;
+    var startX,startW,rightFixedW;
     bar.addEventListener('mousedown',function(e){
         e.preventDefault();startX=e.clientX;startW=left.offsetWidth;
+        if(right)rightFixedW=right.offsetWidth;
         bar.classList.add('active');
         function onMove(ev){
             var dx=ev.clientX-startX;
             var newW=startW+dx;
             var total=main.offsetWidth;
             var minW=120;
-            newW=Math.max(minW,Math.min(newW,total-minW-6));
+            newW=Math.max(minW,Math.min(newW,total-minW-rightFixedW-6));
             left.style.width=newW+'px';
             left.style.flex='none';
-            // 同时调整右侧面板宽度，填满剩余空间
-            if(right){
-                right.style.width='auto';
-                right.style.flex='1';
-            }
+            if(right){right.style.width=rightFixedW+'px';right.style.flex='none';}
         }
         function onUp(){
             bar.classList.remove('active');
@@ -2476,15 +2508,14 @@ document.getElementById('reportBtn').onclick=async function(){
             var styleEl=document.createElementNS('http://www.w3.org/2000/svg','style');
             styleEl.textContent='.mm-link{fill:none;stroke-width:1.2}.mm-rect{rx:8;ry:8}';
             cloned.insertBefore(styleEl,cloned.firstChild);
-            // 获取原始尺寸并缩放到合适大小
             var origW=parseFloat(svgEl.getAttribute('width'))||800;
             var origH=parseFloat(svgEl.getAttribute('height'))||600;
-            var targetW=Math.min(origW,680);
             cloned.setAttribute('viewBox','0 0 '+origW+' '+origH);
-            cloned.setAttribute('width',targetW);
-            cloned.setAttribute('height',origH*(targetW/origW));
-            cloned.style.width=targetW+'px';
-            mmSVG='<div style="background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;overflow:auto;max-height:500px;padding:8px">'+cloned.outerHTML+'</div>';
+            cloned.removeAttribute('width');
+            cloned.removeAttribute('height');
+            cloned.style.width='100%';
+            cloned.style.height='auto';
+            mmSVG='<div style="background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;padding:10px;page-break-inside:avoid">'+cloned.outerHTML+'</div>';
         }
     }
     if(!mmSVG)mmSVG='<div style="background:#f8fafc;border-radius:8px;padding:16px;text-align:center;color:#94a3b8;font-size:11px;border:1px solid #e2e8f0">暂无脑图数据</div>';
