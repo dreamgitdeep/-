@@ -892,7 +892,7 @@ var MM_THEMES=[
         ],
         link:'#a3a38a',linkOp:.5}
 ];
-var mmThemeId=localStorage.getItem('mm_theme')||'candy';
+var mmThemeId=(function(){var v=localStorage.getItem('mm_theme');if(!v||v==='rainbow'){localStorage.setItem('mm_theme','candy');return 'candy';}return v;})();
 function getTheme(){return MM_THEMES.find(function(t){return t.id===mmThemeId;})||MM_THEMES[1];}
 function getLevelStyle(depth){
     var t=getTheme();
