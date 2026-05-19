@@ -52,11 +52,11 @@ body{display:flex;flex-direction:column;font-family:system-ui,-apple-system,sans
 .resize-bar:hover::after,.resize-bar.active::after{background:#fff}
 
 /* 教材 */
-.tb-block{margin-bottom:12px;padding:8px 10px 8px 12px;border-left:3px solid #818cf8;border-radius:0 8px 8px 0;background:rgba(255,255,255,.4);transition:background .15s}
+.tb-block{margin-bottom:12px;padding:8px 10px 8px 12px;border-left:3px solid #818cf8;border-radius:0 8px 8px 0;background:rgba(255,255,255,.4);transition:background .15s;user-select:none;-webkit-user-select:none}
 .tb-block:hover{background:rgba(255,255,255,.7)}
 .tb-title{font-weight:600;color:#4338ca;font-size:13px;margin-bottom:4px}
 .tb-text{font-size:13px;color:#334155;line-height:1.8;user-select:text;-webkit-user-select:text;cursor:text}
-.drag-handle{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;background:#e0e7ff;color:#4f46e5;cursor:grab;font-size:9px;margin-left:4px;vertical-align:middle;opacity:0;transition:opacity .15s}
+.drag-handle{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;background:#e0e7ff;color:#4f46e5;cursor:grab;font-size:9px;margin-left:4px;vertical-align:middle;opacity:0;transition:opacity .15s;user-select:none;-webkit-user-select:none}
 .tb-block:hover .drag-handle{opacity:1}
 .drag-handle:active{cursor:grabbing;background:#c7d2fe}
 
@@ -80,7 +80,7 @@ body{display:flex;flex-direction:column;font-family:system-ui,-apple-system,sans
 .mm-g.sel .mm-rect{stroke-width:2;filter:drop-shadow(0 4px 12px rgba(0,0,0,.15))}
 .mm-link{fill:none;stroke:#c7d2fe;stroke-width:1.2;opacity:.7}
 .mm-drop .mm-rect{stroke:#10b981!important;stroke-width:2;stroke-dasharray:6 3;fill:#ecfdf5!important}
-.mm-drop{transform:scale(1.08);transform-origin:center;filter:drop-shadow(0 4px 12px rgba(16,185,129,.3))}
+.mm-drop{transform:scale(1.08);transform-origin:center;filter:drop-shadow(0 4px 12px rgba(16,185,129,.3));transition:transform .15s ease,filter .15s ease}
 .mm-del-btn{opacity:0;transition:opacity .15s;font-size:14px}
 .mm-g:hover .mm-del-btn{opacity:0.8}
 .mm-del-btn:hover{opacity:1!important;fill:#dc2626!important}
@@ -507,6 +507,7 @@ function renderTB(){
     document.getElementById('tbContent').addEventListener('dragstart',function(e){
         if(!e.target.classList.contains('drag-handle')){
             e.preventDefault();
+            try{window.getSelection().removeAllRanges();}catch(ex){}
         }
     });
 }
@@ -1230,29 +1231,9 @@ function bindMMEvents(){
             }
             ta.addEventListener('keydown',function(ke){if(ke.key==='Enter'&&!ke.shiftKey){ke.preventDefault();done();}if(ke.key==='Escape'){if(wrap.parentNode)wrap.remove();renderMM();}});
         });
-        // 教材文字拖入 → 创建子节点（用计数器防止子元素触发dragleave导致闪烁）
-        g._dragCounter=0;
-        g.addEventListener('dragenter',function(e){
-            if(nodeDragActive)return;
-            e.preventDefault();
-            g._dragCounter++;
-            g.classList.add('mm-drop');
-        });
-        g.addEventListener('dragover',function(e){
-            if(nodeDragActive)return;
-            e.preventDefault();
-            e.dataTransfer.dropEffect='copy';
-        });
-        g.addEventListener('dragleave',function(e){
-            if(nodeDragActive)return;
-            g._dragCounter--;
-            if(g._dragCounter<=0){
-                g._dragCounter=0;
-                g.classList.remove('mm-drop');
-            }
-        });
+        // 教材文字拖入 → 创建子节点（仅保留drop，dragover/dragleave由mmArea全局处理）
         g.addEventListener('drop',function(e){
-            e.preventDefault();g._dragCounter=0;g.classList.remove('mm-drop');
+            e.preventDefault();
             if(nodeDragActive)return;
             var text=e.dataTransfer.getData('text/plain')||dragText;
             if(text){
@@ -1343,6 +1324,30 @@ function applyMMPan(){
 mmArea.addEventListener('mousedown',function(e){if(e.target.closest('.mm-g')||e.target.dataset.tog||e.target.dataset.add||e.target.dataset.collapse)return;isPanning=true;panStartX=e.clientX;panStartY=e.clientY;mmArea.style.cursor='grabbing';e.preventDefault();});
 document.addEventListener('mousemove',function(e){if(!isPanning)return;var dx=e.clientX-panStartX,dy=e.clientY-panStartY;panOfsX+=dx;panOfsY+=dy;panStartX=e.clientX;panStartY=e.clientY;applyMMPan();});
 document.addEventListener('mouseup',function(){if(isPanning){isPanning=false;mmArea.style.cursor='grab';}});
+
+// ========== 全局教材拖入脑图：高亮目标节点 ==========
+(function(){
+    var lastDropTarget=null;
+    mmArea.addEventListener('dragover',function(e){
+        if(nodeDragActive)return;
+        var g=e.target.closest&&e.target.closest('.mm-g');
+        if(g){
+            e.preventDefault();
+            e.dataTransfer.dropEffect='copy';
+            if(lastDropTarget&&lastDropTarget!==g)lastDropTarget.classList.remove('mm-drop');
+            g.classList.add('mm-drop');
+            lastDropTarget=g;
+        }
+    });
+    mmArea.addEventListener('dragleave',function(e){
+        if(!mmArea.contains(e.relatedTarget)){
+            if(lastDropTarget){lastDropTarget.classList.remove('mm-drop');lastDropTarget=null;}
+        }
+    });
+    mmArea.addEventListener('drop',function(){
+        if(lastDropTarget){lastDropTarget.classList.remove('mm-drop');lastDropTarget=null;}
+    });
+})();
 
 // ========== 子节点拖拽排序 ==========
 mmArea.addEventListener('mousedown',function(e){
