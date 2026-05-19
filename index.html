@@ -1884,20 +1884,35 @@ function initResize(barId,leftId,rightId){
     var left=document.getElementById(leftId);
     var right=document.getElementById(rightId);
     var main=document.getElementById('main');
-    var startX,startW,rightFixedW;
+    // 找到不相邻的第三个面板
+    var otherId=['pLeft','pMid','pRight'].filter(function(id){return id!==leftId&&id!==rightId;})[0];
+    var other=document.getElementById(otherId);
+    var startX,startW,otherW;
     bar.addEventListener('mousedown',function(e){
-        e.preventDefault();startX=e.clientX;startW=left.offsetWidth;
-        if(right)rightFixedW=right.offsetWidth;
+        e.preventDefault();
+        // 冻结所有面板为像素宽度
+        [left,right,other].forEach(function(p){
+            if(p&&!p.classList.contains('collapsed')){
+                p.style.width=p.offsetWidth+'px';
+                p.style.flex='none';
+            }
+        });
+        startX=e.clientX;
+        startW=left.offsetWidth;
+        otherW=other&&!other.classList.contains('collapsed')?other.offsetWidth:0;
         bar.classList.add('active');
         function onMove(ev){
             var dx=ev.clientX-startX;
-            var newW=startW+dx;
+            var newW=Math.max(120,startW+dx);
             var total=main.offsetWidth;
-            var minW=120;
-            newW=Math.max(minW,Math.min(newW,total-minW-rightFixedW-6));
+            var maxW=total-otherW-12;
+            newW=Math.min(newW,maxW);
             left.style.width=newW+'px';
-            left.style.flex='none';
-            if(right){right.style.width=rightFixedW+'px';right.style.flex='none';}
+            // 只调整相邻的右侧面板，第三个面板不动
+            var rightW=total-newW-otherW-6;
+            if(right&&!right.classList.contains('collapsed')&&rightW>=120){
+                right.style.width=rightW+'px';
+            }
         }
         function onUp(){
             bar.classList.remove('active');
