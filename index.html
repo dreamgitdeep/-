@@ -503,6 +503,12 @@ function renderTB(){
     });
     document.getElementById('tbContent').innerHTML=html;
     bindDrag();
+    // 禁止教材区域选中文字后的浏览器原生"搜索"拖拽行为
+    document.getElementById('tbContent').addEventListener('dragstart',function(e){
+        if(!e.target.classList.contains('drag-handle')){
+            e.preventDefault();
+        }
+    });
 }
 // 选中文字浮动操作按钮
 (function(){
@@ -518,16 +524,10 @@ function renderTB(){
             var range=sel.getRangeAt(0);
             var rect=range.getBoundingClientRect();
             floater=document.createElement('div');
-            floater.style.cssText='position:fixed;z-index:9999;display:flex;gap:6px;background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:6px 10px;left:'+(rect.left+rect.width/2-90)+'px;top:'+(rect.top-44)+'px;animation:fadeInUp .15s ease';
-            floater.innerHTML='<button id="selAddMM" style="background:#4f46e5;color:#fff;border:none;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap"><i class="fas fa-brain" style="margin-right:3px"></i>添加到脑图</button>'
-                +'<button id="selSearch" style="background:#f1f5f9;color:#475569;border:none;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap"><i class="fas fa-search" style="margin-right:3px"></i>搜索</button>';
+            floater.style.cssText='position:fixed;z-index:9999;display:flex;gap:6px;background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:6px 10px;left:'+(rect.left+rect.width/2-50)+'px;top:'+(rect.top-44)+'px;animation:fadeInUp .15s ease';
+            floater.innerHTML='<button id="selAskAI" style="background:#4f46e5;color:#fff;border:none;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap"><i class="fas fa-robot" style="margin-right:3px"></i>问AI助教</button>';
             document.body.appendChild(floater);
-            document.getElementById('selAddMM').onclick=function(){
-                dragText=text;
-                toast('已复制文字，请点击脑图节点添加');
-                removeFloater();
-            };
-            document.getElementById('selSearch').onclick=function(){
+            document.getElementById('selAskAI').onclick=function(){
                 document.getElementById('userInput').value='请帮我解释：'+text;
                 document.getElementById('sendBtn').click();
                 removeFloater();
@@ -1230,19 +1230,29 @@ function bindMMEvents(){
             }
             ta.addEventListener('keydown',function(ke){if(ke.key==='Enter'&&!ke.shiftKey){ke.preventDefault();done();}if(ke.key==='Escape'){if(wrap.parentNode)wrap.remove();renderMM();}});
         });
-        // 教材文字拖入 → 创建子节点
+        // 教材文字拖入 → 创建子节点（用计数器防止子元素触发dragleave导致闪烁）
+        g._dragCounter=0;
+        g.addEventListener('dragenter',function(e){
+            if(nodeDragActive)return;
+            e.preventDefault();
+            g._dragCounter++;
+            g.classList.add('mm-drop');
+        });
         g.addEventListener('dragover',function(e){
             if(nodeDragActive)return;
             e.preventDefault();
             e.dataTransfer.dropEffect='copy';
-            g.classList.add('mm-drop');
         });
-        g.addEventListener('dragleave',function(){
+        g.addEventListener('dragleave',function(e){
             if(nodeDragActive)return;
-            g.classList.remove('mm-drop');
+            g._dragCounter--;
+            if(g._dragCounter<=0){
+                g._dragCounter=0;
+                g.classList.remove('mm-drop');
+            }
         });
         g.addEventListener('drop',function(e){
-            e.preventDefault();g.classList.remove('mm-drop');
+            e.preventDefault();g._dragCounter=0;g.classList.remove('mm-drop');
             if(nodeDragActive)return;
             var text=e.dataTransfer.getData('text/plain')||dragText;
             if(text){
