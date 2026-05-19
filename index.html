@@ -40,15 +40,6 @@ body{display:flex;flex-direction:column;font-family:system-ui,-apple-system,sans
 .tf .panel-header,.tf #tbToolbar,.tf .mm-toolbar{background:#dcfce7}
 .tf .panel-body{background:#f0fdf4}
 
-.td{background:#0f0f1a;color:#e2e8f0}
-.td .panel{background:#1a1a2e;color:#e2e8f0;border-color:#2d2d44}
-.td .panel-header,.td #tbToolbar,.td .mm-toolbar{background:#16162a;color:#e2e8f0}
-.td .panel-body{background:#1a1a2e}
-.td .tab{background:#2d2d44;color:#a5b4fc}
-.td .tab.on{background:#4f46e5;color:#fff}
-.td .bp{background:#4f46e5;color:#fff}
-.td textarea,.td select,.td input{background:#2d2d44;color:#e2e8f0;border-color:#3d3d5c}
-
 /* 面板 */
 .panel{display:flex;flex-direction:column;overflow:hidden;background:#fff;transition:none}
 .panel-header{flex-shrink:0;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e2e8f0}
@@ -209,7 +200,7 @@ body{display:flex;flex-direction:column;font-family:system-ui,-apple-system,sans
 <span style="font-size:10px;background:#e0e7ff;color:#4338ca;padding:1px 6px;border-radius:8px">V1.0</span>
 </div>
 <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">
-<select id="themeSel" style="font-size:11px;border:1px solid #e2e8f0;border-radius:12px;padding:2px 6px"><option value="tp">📜 羊皮纸</option><option value="tl">☀️ 浅色</option><option value="to">🌊 海蓝</option><option value="tf">🌲 森绿</option><option value="td">🌙 暗夜</option></select>
+<select id="themeSel" style="font-size:11px;border:1px solid #e2e8f0;border-radius:12px;padding:2px 6px"><option value="tp">📜 羊皮纸</option><option value="tl">☀️ 浅色</option><option value="to">🌊 海蓝</option><option value="tf">🌲 森绿</option></select>
 <select id="sizeSel" style="font-size:11px;border:1px solid #e2e8f0;border-radius:12px;padding:2px 6px"><option value="13">13px</option><option value="14" selected>14px</option><option value="16">16px</option></select>
 <button id="reportBtn" class="bp"><i class="fas fa-download" style="margin-right:3px"></i>学习报告</button>
 </div>
@@ -867,45 +858,36 @@ var MM_THEMES=[
         bg:'#f8f8f8',
         levels:[
             {fill:'#333',stroke:'#333',text:'#fff'},
-            {fill:'#fff',stroke:'#888',text:'#333'},
-            {fill:'#fff',stroke:'#aaa',text:'#444'},
-            {fill:'#fafafa',stroke:'#ccc',text:'#555'}
+            {fill:'#fff',stroke:'#888',text:'#1a1a1a'},
+            {fill:'#fff',stroke:'#aaa',text:'#1a1a1a'},
+            {fill:'#fafafa',stroke:'#ccc',text:'#1a1a1a'}
         ],
         link:'#bbb',linkOp:.5},
     {id:'rainbow',name:'彩虹',desc:'每层不同彩色，活泼明快',
         bg:'#fafafa',
         levels:[
-            {fill:'url(#grad-r0)',stroke:'#7c3aed',text:'#fff'},
-            {fill:'url(#grad-r1)',stroke:'#2563eb',text:'#fff'},
-            {fill:'url(#grad-r2)',stroke:'#059669',text:'#fff'},
-            {fill:'url(#grad-r3)',stroke:'#d97706',text:'#fff'}
+            {fill:'url(#grad-r0)',stroke:'#7c3aed',text:'#1a1a1a'},
+            {fill:'url(#grad-r1)',stroke:'#2563eb',text:'#1a1a1a'},
+            {fill:'url(#grad-r2)',stroke:'#059669',text:'#1a1a1a'},
+            {fill:'url(#grad-r3)',stroke:'#d97706',text:'#1a1a1a'}
         ],
         link:'#a78bfa',linkOp:.5},
     {id:'candy',name:'糖果',desc:'粉色薄荷薰衣草，可爱风',
         bg:'#fdf6f9',
         levels:[
-            {fill:'url(#grad-c0)',stroke:'#ec4899',text:'#fff'},
-            {fill:'url(#grad-c1)',stroke:'#a78bfa',text:'#fff'},
-            {fill:'url(#grad-c2)',stroke:'#34d399',text:'#fff'},
-            {fill:'url(#grad-c3)',stroke:'#fbbf24',text:'#78350f'}
+            {fill:'url(#grad-c0)',stroke:'#ec4899',text:'#1a1a1a'},
+            {fill:'url(#grad-c1)',stroke:'#a78bfa',text:'#1a1a1a'},
+            {fill:'url(#grad-c2)',stroke:'#34d399',text:'#1a1a1a'},
+            {fill:'url(#grad-c3)',stroke:'#fbbf24',text:'#1a1a1a'}
         ],
         link:'#f9a8d4',linkOp:.5},
-    {id:'dark',name:'暗夜',desc:'深色背景 + 霓虹色节点',
-        bg:'#0f0f1a',
-        levels:[
-            {fill:'url(#grad-d0)',stroke:'#818cf8',text:'#fff'},
-            {fill:'url(#grad-d1)',stroke:'#38bdf8',text:'#fff'},
-            {fill:'url(#grad-d2)',stroke:'#34d399',text:'#fff'},
-            {fill:'url(#grad-d3)',stroke:'#f472b6',text:'#fff'}
-        ],
-        link:'#4f46e5',linkOp:.4},
     {id:'nature',name:'自然',desc:'绿色棕色，大地色系',
         bg:'#f5f3ee',
         levels:[
-            {fill:'url(#grad-n0)',stroke:'#65a30d',text:'#fff'},
-            {fill:'url(#grad-n1)',stroke:'#a16207',text:'#fff'},
-            {fill:'url(#grad-n2)',stroke:'#0d9488',text:'#fff'},
-            {fill:'url(#grad-n3)',stroke:'#78716c',text:'#fff'}
+            {fill:'url(#grad-n0)',stroke:'#65a30d',text:'#1a1a1a'},
+            {fill:'url(#grad-n1)',stroke:'#a16207',text:'#1a1a1a'},
+            {fill:'url(#grad-n2)',stroke:'#0d9488',text:'#1a1a1a'},
+            {fill:'url(#grad-n3)',stroke:'#78716c',text:'#1a1a1a'}
         ],
         link:'#a3a38a',linkOp:.5}
 ];
@@ -1075,11 +1057,6 @@ function renderMM(){
     defs+='<linearGradient id="grad-c1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#c4b5fd"/></linearGradient>';
     defs+='<linearGradient id="grad-c2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#a7f3d0"/></linearGradient>';
     defs+='<linearGradient id="grad-c3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#fde68a"/></linearGradient>';
-    // 暗夜主题渐变
-    defs+='<linearGradient id="grad-d0" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4f46e5"/><stop offset="100%" stop-color="#818cf8"/></linearGradient>';
-    defs+='<linearGradient id="grad-d1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0369a1"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient>';
-    defs+='<linearGradient id="grad-d2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#047857"/><stop offset="100%" stop-color="#34d399"/></linearGradient>';
-    defs+='<linearGradient id="grad-d3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#be185d"/><stop offset="100%" stop-color="#f472b6"/></linearGradient>';
     // 自然主题渐变
     defs+='<linearGradient id="grad-n0" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4d7c0f"/><stop offset="100%" stop-color="#a3e635"/></linearGradient>';
     defs+='<linearGradient id="grad-n1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a16207"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient>';
@@ -2385,7 +2362,7 @@ userInput.addEventListener('keydown',function(e){
 });
 
 // ========== 主题/字号 ==========
-var THEME_MM_MAP={tp:'rainbow',tl:'rainbow',to:'candy',tf:'nature',td:'dark'};
+var THEME_MM_MAP={tp:'rainbow',tl:'rainbow',to:'candy',tf:'nature'};
 function applyTheme(th){
     document.body.className=th;
     localStorage.setItem('theme_v2',th);
@@ -2395,7 +2372,7 @@ function applyTheme(th){
     localStorage.setItem('mm_theme',newMM);
     renderMM();
 }
-var st=localStorage.getItem('theme_v2')||'tp';applyTheme(st);document.getElementById('themeSel').value=st;
+var st=localStorage.getItem('theme_v2')||'tp';if(st==='td')st='tp';applyTheme(st);document.getElementById('themeSel').value=st;
 document.getElementById('themeSel').onchange=function(e){applyTheme(e.target.value);};
 document.getElementById('sizeSel').onchange=function(e){
     var size=e.target.value+'px';
@@ -2511,14 +2488,16 @@ document.getElementById('reportBtn').onclick=async function(){
             var origW=parseFloat(svgEl.getAttribute('width'))||800;
             var origH=parseFloat(svgEl.getAttribute('height'))||600;
             cloned.setAttribute('viewBox','0 0 '+origW+' '+origH);
-            cloned.removeAttribute('width');
-            cloned.removeAttribute('height');
+            cloned.setAttribute('width','100%');
+            cloned.setAttribute('preserveAspectRatio','xMidYMin meet');
             cloned.style.width='100%';
-            cloned.style.height='auto';
-            mmSVG='<div style="background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;padding:10px;page-break-inside:avoid">'+cloned.outerHTML+'</div>';
+            cloned.style.display='block';
+            mmSVG='<div style="border:2px dashed #c7d2fe;border-radius:10px;background:#fafafe;padding:12px;page-break-inside:avoid;position:relative">'
+                +'<div style="position:absolute;top:6px;right:10px;font-size:9px;color:#a5b4fc"><i class="fas fa-expand" style="margin-right:2px"></i>脑图区域</div>'
+                +cloned.outerHTML+'</div>';
         }
     }
-    if(!mmSVG)mmSVG='<div style="background:#f8fafc;border-radius:8px;padding:16px;text-align:center;color:#94a3b8;font-size:11px;border:1px solid #e2e8f0">暂无脑图数据</div>';
+    if(!mmSVG)mmSVG='<div style="border:2px dashed #c7d2fe;border-radius:10px;padding:30px;text-align:center;color:#94a3b8;font-size:11px">暂无脑图数据</div>';
 
     // 获取学生信息
     var sName=quizState.name||'';var sSID=quizState.sid||'';
