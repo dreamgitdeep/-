@@ -2309,13 +2309,11 @@ window.resetQuiz=function(){
     clearInterval(quizState.timer);
     var prevScore=quizState.lastScore,prevDiff=quizState.lastDifficulty;
     quizState={active:false,questions:[],currentIndex:0,answers:[],startTime:null,timer:null,name:'',sid:'',lastScore:prevScore,lastDifficulty:prevDiff};
-    // 恢复考核介绍
+    // 恢复考核介绍（不显示聊天区和输入框，保持在考核模式）
     document.getElementById('quizIntro').innerHTML=quizIntroHTML;
     document.getElementById('quizIntro').style.display='';
     document.getElementById('quizProgress').style.display='none';
     document.getElementById('quizBody').innerHTML='';
-    document.getElementById('chat').style.display='';
-    document.getElementById('inputArea').style.display='';
     document.getElementById('quizProgressBar').style.width='0%';
     // 恢复学生信息
     var si=localStorage.getItem('quizStudentInfo');
