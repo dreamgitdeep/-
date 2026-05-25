@@ -2115,6 +2115,39 @@ function adjustPanels(){
 
 // ========== 模式切换 ==========
 var quizLevel='easy'; // 默认难度
+function applyModeStyle(mode){
+    var quizPanel=document.getElementById('quizPanel');
+    var inputArea=document.getElementById('inputArea');
+    var chatDiv=document.getElementById('chat');
+    var aiHeader=document.querySelector('#pRight .panel-header');
+    var userInputEl=document.getElementById('userInput');
+    var modeBar=document.querySelector('#pRight > div:nth-child(2)');
+    if(mode==='quiz'){
+        quizPanel.style.display='flex';
+        inputArea.style.display='none';
+        chatDiv.style.display='none';
+        if(aiHeader)aiHeader.style.cssText='';
+    }else{
+        quizPanel.style.display='none';
+        inputArea.style.display='block';
+        chatDiv.style.display='';
+        if(mode==='qa'){
+            chatDiv.style.cssText='display:flex;flex-direction:column;gap:6px;background:#e0e7ff!important';
+            inputArea.style.cssText='flex-shrink:0;border-top:2px solid #818cf8;background:#e0e7ff';
+            if(aiHeader)aiHeader.style.cssText='background:#e0e7ff;border-bottom:2px solid #818cf8';
+            if(modeBar)modeBar.style.cssText='flex-shrink:0;display:flex;border-bottom:2px solid #818cf8;padding:3px 6px;gap:3px;background:#ddd6fe';
+            if(userInputEl)userInputEl.placeholder='输入你的问题，我会结合教材为你解答...';
+        }else if(mode==='guide'){
+            chatDiv.style.cssText='display:flex;flex-direction:column;gap:6px;background:#d1fae5!important';
+            inputArea.style.cssText='flex-shrink:0;border-top:2px solid #34d399;background:#d1fae5';
+            if(aiHeader)aiHeader.style.cssText='background:#d1fae5;border-bottom:2px solid #34d399';
+            if(modeBar)modeBar.style.cssText='flex-shrink:0;display:flex;border-bottom:2px solid #34d399;padding:3px 6px;gap:3px;background:#a7f3d0';
+            if(userInputEl)userInputEl.placeholder='告诉我你想探索的问题，我会一步步引导你思考...';
+        }
+        // 更新空状态提示
+        if(!chatMsgs.length)renderChat();
+    }
+}
 document.querySelectorAll('.mode-btn').forEach(function(btn){
     btn.onclick=function(){
         var newMode=btn.dataset.mode;
@@ -2122,36 +2155,7 @@ document.querySelectorAll('.mode-btn').forEach(function(btn){
         document.querySelectorAll('.mode-btn').forEach(function(b){b.style.background='#f1f5f9';b.style.color='#475569';b.style.fontWeight='normal';});
         btn.style.background='#4f46e5';btn.style.color='#fff';btn.style.fontWeight='600';
         aiMode=newMode;
-        var quizPanel=document.getElementById('quizPanel');
-        var inputArea=document.getElementById('inputArea');
-        var chatDiv=document.getElementById('chat');
-        var aiHeader=document.querySelector('#pRight .panel-header');
-        var userInputEl=document.getElementById('userInput');
-        if(aiMode==='quiz'){
-            quizPanel.style.display='flex';
-            inputArea.style.display='none';
-            chatDiv.style.display='none';
-            if(aiHeader)aiHeader.style.background='';
-        }else{
-            quizPanel.style.display='none';
-            inputArea.style.display='block';
-            chatDiv.style.display='';
-            if(aiMode==='qa'){
-                chatDiv.style.background='linear-gradient(180deg,#eef2ff,#f5f3ff)';
-                inputArea.style.background='#eef2ff';
-                inputArea.style.borderColor='#c7d2fe';
-                if(aiHeader)aiHeader.style.background='linear-gradient(135deg,#eef2ff,#ede9fe)';
-                if(userInputEl)userInputEl.placeholder='输入你的问题，我会结合教材为你解答...';
-            }else if(aiMode==='guide'){
-                chatDiv.style.background='linear-gradient(180deg,#ecfdf5,#f0fdf4)';
-                inputArea.style.background='#ecfdf5';
-                inputArea.style.borderColor='#a7f3d0';
-                if(aiHeader)aiHeader.style.background='linear-gradient(135deg,#ecfdf5,#d1fae5)';
-                if(userInputEl)userInputEl.placeholder='告诉我你想探索的问题，我会一步步引导你思考...';
-            }
-            // 更新空状态提示
-            if(!chatMsgs.length)renderChat();
-        }
+        applyModeStyle(newMode);
     };
 });
 // 难度选择
@@ -2790,12 +2794,7 @@ document.getElementById('uploadBtn2').onclick=function(){upFiles=[];folderFiles=
 openImgDB().then(function(){return loadTBImages();}).then(function(){
     buildTabs();renderTB();renderMM();
     // 初始化问答模式样式
-    var chatDivInit=document.getElementById('chat');
-    var inputAreaInit=document.getElementById('inputArea');
-    var aiHeaderInit=document.querySelector('#pRight .panel-header');
-    if(chatDivInit)chatDivInit.style.background='linear-gradient(180deg,#eef2ff,#f5f3ff)';
-    if(inputAreaInit){inputAreaInit.style.background='#eef2ff';inputAreaInit.style.borderColor='#c7d2fe';}
-    if(aiHeaderInit)aiHeaderInit.style.background='linear-gradient(135deg,#eef2ff,#ede9fe)';
+    applyModeStyle('qa');
     addChat('assistant','📖 学习是一种信仰。\n\n善用教材与脑图，构建属于你自己的知识体系。有任何问题，随时问我。');
 });
 })();
