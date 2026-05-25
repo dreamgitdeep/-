@@ -1866,13 +1866,27 @@ function addChat(role,content){
 }
 function renderChat(){
     var c=document.getElementById('chat');if(!c)return;
-    if(!chatMsgs.length){
+    // 根据模式显示不同的欢迎语
+    if(!chatMsgs.length||chatMsgs.length===1){
+        var welcomeMsg='';
         if(aiMode==='guide'){
-            c.innerHTML='<div style="text-align:center;color:#94a3b8;margin-top:30px"><i class="fas fa-compass" style="font-size:32px;color:#34d399"></i><p style="font-size:13px;margin-top:8px;font-weight:600;color:#059669">引导探索模式</p><p style="font-size:11px;margin-top:4px;color:#6ee7b7">我会引导你一步步思考，不直接给出答案</p></div>';
+            welcomeMsg='<div style="text-align:center;margin-top:20px;padding:20px;background:rgba(255,255,255,.7);border-radius:16px;border:1px solid #a7f3d0">'
+                +'<i class="fas fa-compass" style="font-size:36px;color:#34d399"></i>'
+                +'<p style="font-size:14px;margin-top:10px;font-weight:700;color:#059669">🧭 引导探索模式</p>'
+                +'<p style="font-size:12px;margin-top:6px;color:#047857;line-height:1.8">我不会直接告诉你答案<br>而是通过提问引导你自己思考和发现</p>'
+                +'<p style="font-size:11px;margin-top:8px;color:#6ee7b7">输入你想探索的问题，我们开始吧</p>'
+                +'</div>';
         }else{
-            c.innerHTML='<div style="text-align:center;color:#94a3b8;margin-top:30px"><i class="fas fa-robot" style="font-size:32px;color:#818cf8"></i><p style="font-size:13px;margin-top:8px;font-weight:600;color:#4f46e5">问答模式</p><p style="font-size:11px;margin-top:4px;color:#a5b4fc">随时可以向我提问，我会结合教材为你解答</p></div>';
+            welcomeMsg='<div style="text-align:center;margin-top:20px;padding:20px;background:rgba(255,255,255,.7);border-radius:16px;border:1px solid #c7d2fe">'
+                +'<i class="fas fa-book-reader" style="font-size:36px;color:#818cf8"></i>'
+                +'<p style="font-size:14px;margin-top:10px;font-weight:700;color:#4338ca">📖 学习是一种信仰</p>'
+                +'<p style="font-size:12px;margin-top:6px;color:#475569;line-height:1.8">善用教材与脑图，构建属于你自己的知识体系<br>有任何问题，随时问我</p>'
+                +'<p style="font-size:11px;margin-top:8px;color:#a5b4fc">输入你的问题，我会结合教材为你解答</p>'
+                +'</div>';
         }
-        return;
+        if(!chatMsgs.length){
+            c.innerHTML=welcomeMsg;return;
+        }
     }
     c.innerHTML=chatMsgs.map(function(m){
         var aiClass=m.role==='user'?'user':'ai'+(aiMode==='guide'?' guide-ai':'');
@@ -2144,8 +2158,8 @@ function applyModeStyle(mode){
             if(modeBar)modeBar.style.cssText='flex-shrink:0;display:flex;border-bottom:2px solid #34d399;padding:3px 6px;gap:3px;background:#a7f3d0';
             if(userInputEl)userInputEl.placeholder='告诉我你想探索的问题，我会一步步引导你思考...';
         }
-        // 更新空状态提示
-        if(!chatMsgs.length)renderChat();
+        // 切换模式时更新欢迎语
+        if(!chatMsgs.length||chatMsgs.length===1)renderChat();
     }
 }
 document.querySelectorAll('.mode-btn').forEach(function(btn){
@@ -2795,7 +2809,7 @@ openImgDB().then(function(){return loadTBImages();}).then(function(){
     buildTabs();renderTB();renderMM();
     // 初始化问答模式样式
     applyModeStyle('qa');
-    addChat('assistant','📖 学习是一种信仰。\n\n善用教材与脑图，构建属于你自己的知识体系。有任何问题，随时问我。');
+    renderChat();
 });
 })();
 </script>
